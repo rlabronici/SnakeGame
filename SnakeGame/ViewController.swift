@@ -20,14 +20,22 @@ class ViewController: UIViewController {
     
     var squareSize: CGFloat!
     
+    var fruitPosition: MapPosition!
+    
+    var loopGame: Timer!
+    
+    var easyButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.view.backgroundColor = UIColor.blue
         
+        fruitPosition = MapPosition(x: 0, y: 0)
         
         let height = self.view.frame.size.height - gap
         let width = self.view.frame.size.width - gap
+        
+        
         
         let proportion =  width / height
         
@@ -38,15 +46,34 @@ class ViewController: UIViewController {
         
         let rect = CGRect(origin: CGPoint(x: gap / 2, y: gap / 2), size: CGSize(width: widthSquaresNumbers * squareSize, height: heightSquaresNumbers * squareSize))
         mapView = MapView(frame: rect, squareSize: squareSize, snake: snake)
-        self.view.addSubview(mapView)
         
-        let loopGame = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(ViewController.loopTimer), userInfo: nil, repeats: true)
+        easyButton = UIButton(frame: CGRect(origin: CGPoint(x: width/2, y: height * 0.30), size: CGSize(width: 70, height: 70)))
+        easyButton.addTarget(self, action: #selector(pressLevelButton(_:)), for: .touchUpInside)
+        easyButton.setTitle("Easy", for: .normal)
+        easyButton.tintColor = .blue
+        easyButton.backgroundColor = .red
+        mapView.addSubview(easyButton)
+        
+        self.view.addSubview(mapView)
         
         addSwipeGesture()
         
         
     }
 
+    @objc func pressLevelButton(_ sender: UIButton) {
+        sender.isHidden = true
+        startGame()
+    }
+    
+    func startGame(){
+        
+        createFruit()
+        
+        loopGame = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(ViewController.loopTimer), userInfo: nil, repeats: true)
+
+    }
+    
     func addSwipeGesture(){
         let swipes: [UISwipeGestureRecognizerDirection] = [.up, .down, .right, .left]
 
@@ -61,32 +88,56 @@ class ViewController: UIViewController {
         let direction = sender.direction
         switch direction {
         case  UISwipeGestureRecognizerDirection.up:
-            snake.direction = .up
+            if snake.direction != Directions.down{
+                snake.direction = .up
+            }
         case  UISwipeGestureRecognizerDirection.down:
-            snake.direction = .down
+            if snake.direction != Directions.up{
+                snake.direction = .down
+            }
         case  UISwipeGestureRecognizerDirection.right:
-            snake.direction = .right
+            if snake.direction != Directions.left{
+                snake.direction = .right
+            }
         case  UISwipeGestureRecognizerDirection.left:
-            snake.direction = .left
+            if snake.direction != Directions.right{
+                snake.direction = .left
+            }
         default:
             assert(false, "movimento incorreto")
         }
     }
 
     @objc func loopTimer(){
-        self.snake.move()
-        mapView.drawSnake()
         
+        self.snake.move()
+        snake.lastPosition = snake.mapPositions.last
+        if hasEatenFruit(){
+            snake.increaseSnakeLength()
+            createFruit()
+        }
+        if hasHitSomething(){
+            loopGame.invalidate()
+            return
+        }
+        mapView.drawSnake(snake)
+        mapView.drawFruit(x: fruitPosition.x, y: fruitPosition.y)
     }
     
-    func willDrawFruit(){
-        var positionX: Int
-        var positionY: Int
+    func hasEatenFruit() -> Bool{
+        if fruitPosition.x == snake.mapPositions[0].x && fruitPosition.y == snake.mapPositions[0].y{
+            return true
+        }
+        return false
+    }
+    
+    func createFruit(){
         repeat{
-            positionX = Int(arc4random_uniform(UInt32(widthSquaresNumbers)))
-            positionY = Int(arc4random_uniform(UInt32(heightSquaresNumbers)))
-        } while(!canCreateFruit(positionX, positionY))
-        mapView.drawFruit(x: positionX, y: positionY)
+            fruitPosition.x = Int(arc4random_uniform(UInt32(widthSquaresNumbers)))
+            fruitPosition.y = Int(arc4random_uniform(UInt32(heightSquaresNumbers)))
+        } while(!canCreateFruit(fruitPosition.x, fruitPosition.y))
+       
+        
     }
     
     func canCreateFruit(_ positionX: Int,_ positionY: Int) -> Bool{
@@ -96,6 +147,23 @@ class ViewController: UIViewController {
             }
         }
         return true
+    }
+    
+    func hasHitSomething() -> Bool{
+        let snakeHead = snake.mapPositions.first
+        for i in 1..<snake.length{
+            if snakeHead?.x == snake.mapPositions[i].x && snakeHead?.y == snake.mapPositions[i].y{
+                return true
+            }
+        }
+        if (snakeHead?.x)! < 0 || (snakeHead?.x)! >= Int(widthSquaresNumbers) || (snakeHead?.y)! < 0 || (snakeHead?.y)! >= Int(heightSquaresNumbers){
+            return true
+        }
+        return false
+    }
+    
+    func getSnake() -> Snake{
+        return snake
     }
     
     override func didReceiveMemoryWarning() {

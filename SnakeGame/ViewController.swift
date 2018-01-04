@@ -25,6 +25,9 @@ class ViewController: UIViewController {
     var loopGame: Timer!
     
     var easyButton: UIButton!
+    var mediumButton: UIButton!
+    var hardButton: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -47,12 +50,9 @@ class ViewController: UIViewController {
         let rect = CGRect(origin: CGPoint(x: gap / 2, y: gap / 2), size: CGSize(width: widthSquaresNumbers * squareSize, height: heightSquaresNumbers * squareSize))
         mapView = MapView(frame: rect, squareSize: squareSize, snake: snake)
         
-        easyButton = UIButton(frame: CGRect(origin: CGPoint(x: width/2, y: height * 0.30), size: CGSize(width: 70, height: 70)))
-        easyButton.addTarget(self, action: #selector(pressLevelButton(_:)), for: .touchUpInside)
-        easyButton.setTitle("Easy", for: .normal)
-        easyButton.tintColor = .blue
-        easyButton.backgroundColor = .red
-        mapView.addSubview(easyButton)
+        easyButton = createButtonMenu(width: width/2, height: height * 0.3, labelName: "Easy")
+        mediumButton = createButtonMenu(width: width/2, height: height * 0.5, labelName: "Medium")
+        hardButton = createButtonMenu(width: width/2, height: height * 0.7, labelName: "Hard")
         
         self.view.addSubview(mapView)
         
@@ -61,16 +61,42 @@ class ViewController: UIViewController {
         
     }
 
-    @objc func pressLevelButton(_ sender: UIButton) {
-        sender.isHidden = true
-        startGame()
+    func createButtonMenu(width: CGFloat, height: CGFloat, labelName: String) -> UIButton{
+        let button = UIButton(frame: CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 70, height: 40)))
+        button.addTarget(self, action: #selector(pressLevelButton(_:)), for: .touchUpInside)
+        button.setTitle(labelName, for: .normal)
+        button.setTitleColor(.blue, for: .normal)
+        button.center.x = width
+        button.center.y = height
+        mapView.addSubview(button)
+        
+        return button
+        
     }
     
-    func startGame(){
+    @objc func pressLevelButton(_ sender: UIButton) {
+        easyButton.isHidden = true
+        mediumButton.isHidden = true
+        hardButton.isHidden = true
+        
+        var difficulty: Double! = 0
+        switch (sender.titleLabel?.text)!{
+        case "Easy":
+            difficulty = 0.3
+        case "Medium":
+            difficulty = 0.2
+        case "Hard":
+            difficulty = 0.1
+        default:
+            assert(false)
+        }
+        startGameWith(difficulty)
+    }
+    
+    func startGameWith(_ difficulty: Double){
         
         createFruit()
-        
-        loopGame = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(ViewController.loopTimer), userInfo: nil, repeats: true)
+        loopGame = Timer.scheduledTimer(timeInterval: difficulty, target: self, selector: #selector(ViewController.loopTimer), userInfo: nil, repeats: true)
 
     }
     

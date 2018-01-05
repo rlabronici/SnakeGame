@@ -8,7 +8,10 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, MapViewDelegate {
+    
+    var height: CGFloat!
+    var width: CGFloat!
     
     var heightSquaresNumbers: CGFloat = 0
     let widthSquaresNumbers: CGFloat = 17
@@ -29,52 +32,43 @@ class ViewController: UIViewController {
     var mediumButton: UIButton!
     var hardButton: UIButton!
     
+    var gameOverLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.view.backgroundColor = UIColor.blue
         
         fruitPosition = MapPosition(x: 0, y: 0)
-        
-        let height = self.view.frame.size.height - heightGap
-        let width = self.view.frame.size.width - heightGap
-        print("height", height)
-        print("width", width)
+        height = self.view.frame.size.height - heightGap
+        width = self.view.frame.size.width - heightGap
         
         
         let proportion =  width / height
-        print("proportion", proportion)
-//        squareSize = height / heightSquaresNumbers
-//        widthSquaresNumbers = CGFloat(heightSquaresNumbers) * proportion
         squareSize = width / widthSquaresNumbers
         heightSquaresNumbers = widthSquaresNumbers / proportion
-        
+
         heightGap = heightSquaresNumbers - CGFloat(Int(heightSquaresNumbers))
         heightSquaresNumbers -= heightGap
-        heightGap += widthGap
-        
-        
-        print("height Gap", heightGap)
-        
-        print("square size", squareSize)
-        print("width squares number", widthSquaresNumbers)
-        print("height squares numbers", heightSquaresNumbers)
-        
-        
-        snake = Snake()
+        heightGap = widthGap + heightGap * squareSize
         
         let rect = CGRect(origin: CGPoint(x: widthGap / 2, y: heightGap / 2), size: CGSize(width: CGFloat(widthSquaresNumbers) * squareSize, height: heightSquaresNumbers * squareSize))
-        mapView = MapView(frame: rect, squareSize: squareSize, snake: snake)
+        mapView = MapView(frame: rect, squareSize: squareSize)
+        mapView.viewControllerDelegate = self
         
-        easyButton = createButtonMenu(width: width/2, height: height * 0.3, labelName: "Easy")
-        mediumButton = createButtonMenu(width: width/2, height: height * 0.5, labelName: "Medium")
-        hardButton = createButtonMenu(width: width/2, height: height * 0.7, labelName: "Hard")
+        createMenu()
         
         self.view.addSubview(mapView)
         
         addSwipeGesture()
         
         
+    }
+    
+    func createMenu(){
+        easyButton = createButtonMenu(width: width/2, height: height * 0.3, labelName: "Easy")
+        mediumButton = createButtonMenu(width: width/2, height: height * 0.5, labelName: "Medium")
+        hardButton = createButtonMenu(width: width/2, height: height * 0.7, labelName: "Hard")
     }
 
     func createButtonMenu(width: CGFloat, height: CGFloat, labelName: String) -> UIButton{
@@ -111,6 +105,7 @@ class ViewController: UIViewController {
     
     func startGameWith(_ difficulty: Double){
         
+        snake = Snake()
         createFruit()
         loopGame = Timer.scheduledTimer(timeInterval: difficulty, target: self, selector: #selector(ViewController.loopTimer), userInfo: nil, repeats: true)
 
@@ -159,10 +154,10 @@ class ViewController: UIViewController {
             createFruit()
         }
         if hasHitSomething(){
-            loopGame.invalidate()
+            gameOver()
             return
         }
-        mapView.drawSnake(snake)
+        mapView.drawSnake()
         mapView.drawFruit(x: fruitPosition.x, y: fruitPosition.y)
     }
     
@@ -204,7 +199,36 @@ class ViewController: UIViewController {
         return false
     }
     
-    func getSnake() -> Snake{
+    func gameOver(){
+        loopGame.invalidate()
+        gameOverLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 0.9 * mapView.frame.width, height: 100))
+        gameOverLabel.text = "Game Over"
+        gameOverLabel.center.x = mapView.frame.width / 2
+        gameOverLabel.center.y = mapView.frame.height * 0.3
+        gameOverLabel.numberOfLines = 1
+        gameOverLabel.minimumScaleFactor = 0.5
+        gameOverLabel.baselineAdjustment = .alignCenters
+        gameOverLabel.textAlignment  = .center
+        gameOverLabel.font = UIFont.systemFont(ofSize: 80)
+        gameOverLabel.adjustsFontSizeToFitWidth = true
+        mapView.addSubview(gameOverLabel)
+        
+        let retryButton = UIButton(frame: CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 70, height: 40)))
+        retryButton.addTarget(self, action: #selector(retry(_:)), for: .touchUpInside)
+        retryButton.setTitle("retry", for: .normal)
+        retryButton.setTitleColor(.blue, for: .normal)
+        retryButton.center.x = mapView.frame.width / 2
+        retryButton.center.y = gameOverLabel.frame.height + gameOverLabel.frame.origin.y + 0.2 * mapView.frame.height
+        mapView.addSubview(retryButton)
+    }
+    
+    @objc func retry(_ sender: UIButton){
+        sender.removeFromSuperview()
+        gameOverLabel.removeFromSuperview()
+        createMenu()
+    }
+    
+    func getSnake() -> Snake?{
         return snake
     }
     

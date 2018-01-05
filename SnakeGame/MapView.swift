@@ -15,45 +15,37 @@ class MapView: UIView{
     var snake: Snake!
     //var snakeDraw: CGRect!
     var snakeLayer = [CAShapeLayer]()
-
+    
+    var viewControllerDelegate: MapViewDelegate?
     var fruitLayer = CAShapeLayer()
     var fruit: CGRect!
     
-    init(frame: CGRect, squareSize: CGFloat, snake: Snake){
+    init(frame: CGRect, squareSize: CGFloat){
         super.init(frame: frame)
+        
         
         self.backgroundColor = .white
         self.squareSize = squareSize
-        self.snake = snake
-        
-        drawSnake(snake)
+        //self.snake = snake
     }
     
-    func drawSnake(_ snake: Snake){
+    func drawSnake(){
         
-        //snakeLayer = CAShapeLayer()
         for snakes in snakeLayer{
             snakes.removeFromSuperlayer()
         }
-        //snakeLayer.removeFromSuperlayer()
-        var i = 0
-        for location in snake.mapPositions{
-            
-            let snakeDraw = CGRect(origin: CGPoint(x: squareSize * CGFloat(location.x), y: squareSize * CGFloat(location.y)), size: CGSize(width: squareSize, height: squareSize))
-            
-            let sl = CAShapeLayer()
-            sl.path = UIBezierPath(rect: snakeDraw).cgPath
-            sl.strokeColor = UIColor.clear.cgColor
-            sl.fillColor = UIColor.black.cgColor
-            self.layer.addSublayer(sl)
-            snakeLayer.append(sl)
-            
-//            snakeLayer.path = UIBezierPath(rect: snakeDraw).cgPath
-//            snakeLayer.strokeColor = UIColor.clear.cgColor
-//            snakeLayer.fillColor = UIColor.black.cgColor
-//            self.layer.addSublayer(snakeLayer)
-//            print("snake[\(i)] location \(location)")
-            i += 1
+        if let snake = viewControllerDelegate?.getSnake(){
+            for location in snake.mapPositions{
+                
+                let snakeDraw = CGRect(origin: CGPoint(x: squareSize * CGFloat(location.x), y: squareSize * CGFloat(location.y)), size: CGSize(width: squareSize, height: squareSize))
+                
+                let sl = CAShapeLayer()
+                sl.path = UIBezierPath(rect: snakeDraw).cgPath
+                sl.strokeColor = UIColor.clear.cgColor
+                sl.fillColor = UIColor.black.cgColor
+                self.layer.addSublayer(sl)
+                snakeLayer.append(sl)
+            }
         }
     }
     
@@ -71,5 +63,6 @@ class MapView: UIView{
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
     
 }

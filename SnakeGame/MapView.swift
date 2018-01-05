@@ -52,7 +52,7 @@ class MapView: UIView{
 //            snakeLayer.strokeColor = UIColor.clear.cgColor
 //            snakeLayer.fillColor = UIColor.black.cgColor
 //            self.layer.addSublayer(snakeLayer)
-            print("snake[\(i)] location \(location)")
+//            print("snake[\(i)] location \(location)")
             i += 1
         }
     }

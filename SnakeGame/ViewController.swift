@@ -10,9 +10,10 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    let heightSquaresNumbers: CGFloat = 20
-    var widthSquaresNumbers: CGFloat!
-    let gap: CGFloat = 20
+    var heightSquaresNumbers: CGFloat = 0
+    let widthSquaresNumbers: CGFloat = 17
+    let widthGap: CGFloat = 20
+    var heightGap: CGFloat = 20
     
     var mapView: MapView!
     
@@ -35,19 +36,34 @@ class ViewController: UIViewController {
         
         fruitPosition = MapPosition(x: 0, y: 0)
         
-        let height = self.view.frame.size.height - gap
-        let width = self.view.frame.size.width - gap
-        
+        let height = self.view.frame.size.height - heightGap
+        let width = self.view.frame.size.width - heightGap
+        print("height", height)
+        print("width", width)
         
         
         let proportion =  width / height
+        print("proportion", proportion)
+//        squareSize = height / heightSquaresNumbers
+//        widthSquaresNumbers = CGFloat(heightSquaresNumbers) * proportion
+        squareSize = width / widthSquaresNumbers
+        heightSquaresNumbers = widthSquaresNumbers / proportion
         
-        squareSize = height / CGFloat(heightSquaresNumbers)
-        widthSquaresNumbers = CGFloat(heightSquaresNumbers) * proportion
+        heightGap = heightSquaresNumbers - CGFloat(Int(heightSquaresNumbers))
+        heightSquaresNumbers -= heightGap
+        heightGap += widthGap
+        
+        
+        print("height Gap", heightGap)
+        
+        print("square size", squareSize)
+        print("width squares number", widthSquaresNumbers)
+        print("height squares numbers", heightSquaresNumbers)
+        
         
         snake = Snake()
         
-        let rect = CGRect(origin: CGPoint(x: gap / 2, y: gap / 2), size: CGSize(width: widthSquaresNumbers * squareSize, height: heightSquaresNumbers * squareSize))
+        let rect = CGRect(origin: CGPoint(x: widthGap / 2, y: heightGap / 2), size: CGSize(width: CGFloat(widthSquaresNumbers) * squareSize, height: heightSquaresNumbers * squareSize))
         mapView = MapView(frame: rect, squareSize: squareSize, snake: snake)
         
         easyButton = createButtonMenu(width: width/2, height: height * 0.3, labelName: "Easy")

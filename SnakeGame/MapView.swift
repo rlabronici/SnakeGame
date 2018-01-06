@@ -26,7 +26,7 @@ class MapView: UIView{
         
         self.backgroundColor = .white
         self.squareSize = squareSize
-        //self.snake = snake
+        
     }
     
     func drawSnake(){
@@ -52,7 +52,9 @@ class MapView: UIView{
     func drawFruit(x: Int, y: Int){
         
         
-        fruit = CGRect(origin: CGPoint(x: squareSize * CGFloat(x), y: squareSize * CGFloat(y)), size: CGSize(width: squareSize, height: squareSize))
+        //fruit = CGRect(origin: CGPoint(x: squareSize * CGFloat(x), y: squareSize * CGFloat(y)), size: CGSize(width: squareSize, height: squareSize))
+        
+        fruit = CGR
         
         fruitLayer.path = UIBezierPath(rect: fruit).cgPath
         fruitLayer.strokeColor = UIColor.clear.cgColor

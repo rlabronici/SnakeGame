@@ -24,9 +24,12 @@ class ViewController: UIViewController, MapViewDelegate {
     
     var squareSize: CGFloat!
     
-    var fruitPosition: MapPosition!
+    var fruitPosition = MapPosition()
     
     var loopGame: Timer!
+    
+    var scoreLabel: UILabel!
+    var score: Int = 0
     
     var easyButton: UIButton!
     var mediumButton: UIButton!
@@ -37,17 +40,25 @@ class ViewController: UIViewController, MapViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.view.backgroundColor = UIColor.blue
+        self.view.backgroundColor = UIColor.lightGray
         
-        fruitPosition = MapPosition(x: 0, y: 0)
+        createMapView()
+        createMenu()
+        self.view.addSubview(mapView)
+        
+        addSwipeGesture()
+        
+        
+    }
+    
+    func createMapView(){
         height = self.view.frame.size.height - heightGap
         width = self.view.frame.size.width - heightGap
-        
         
         let proportion =  width / height
         squareSize = width / widthSquaresNumbers
         heightSquaresNumbers = widthSquaresNumbers / proportion
-
+        
         heightGap = heightSquaresNumbers - CGFloat(Int(heightSquaresNumbers))
         heightSquaresNumbers -= heightGap
         heightGap = widthGap + heightGap * squareSize
@@ -55,14 +66,6 @@ class ViewController: UIViewController, MapViewDelegate {
         let rect = CGRect(origin: CGPoint(x: widthGap / 2, y: heightGap / 2), size: CGSize(width: CGFloat(widthSquaresNumbers) * squareSize, height: heightSquaresNumbers * squareSize))
         mapView = MapView(frame: rect, squareSize: squareSize)
         mapView.viewControllerDelegate = self
-        
-        createMenu()
-        
-        self.view.addSubview(mapView)
-        
-        addSwipeGesture()
-        
-        
     }
     
     func createMenu(){
@@ -107,8 +110,21 @@ class ViewController: UIViewController, MapViewDelegate {
         
         snake = Snake()
         createFruit()
+        
+        scoreLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 0.9 * mapView.frame.width, height: 20))
+        scoreLabel.text = "Score: \(score)"
+        scoreLabel.center.x = mapView.frame.width / 2
+        scoreLabel.center.y = mapView.frame.height * 0.99999999
+        scoreLabel.numberOfLines = 1
+        scoreLabel.minimumScaleFactor = 0.5
+        scoreLabel.baselineAdjustment = .alignCenters
+        scoreLabel.textAlignment  = .center
+        scoreLabel.font = UIFont.systemFont(ofSize: 20)
+        scoreLabel.adjustsFontSizeToFitWidth = true
+        mapView.addSubview(scoreLabel)
+        
         loopGame = Timer.scheduledTimer(timeInterval: difficulty, target: self, selector: #selector(ViewController.loopTimer), userInfo: nil, repeats: true)
-
+        
     }
     
     func addSwipeGesture(){
@@ -151,6 +167,8 @@ class ViewController: UIViewController, MapViewDelegate {
         snake.lastPosition = snake.mapPositions.last
         if hasEatenFruit(){
             snake.increaseSnakeLength()
+            score += 1
+            scoreLabel.text = "Score: \(score)"
             createFruit()
         }
         if hasHitSomething(){

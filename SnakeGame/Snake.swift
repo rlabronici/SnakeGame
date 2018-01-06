@@ -11,6 +11,16 @@ import Foundation
 struct MapPosition {
     var x: Int
     var y: Int
+    
+    init(){
+        self.x = 0
+        self.y = 0
+    }
+    
+    init(x: Int, y: Int){
+        self.x = x
+        self.y = y
+    }
 }
 
 class Snake {

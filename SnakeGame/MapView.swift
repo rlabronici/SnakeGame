@@ -13,18 +13,17 @@ class MapView: UIView{
     
     var squareSize: CGFloat!
     var snake: Snake!
-    //var snakeDraw: CGRect!
+    
     var snakeLayer = [CAShapeLayer]()
+    let fruitLayer = CAShapeLayer()
     
     var viewControllerDelegate: MapViewDelegate?
-    var fruitLayer = CAShapeLayer()
-    var fruit: CGRect!
     
     init(frame: CGRect, squareSize: CGFloat){
         super.init(frame: frame)
         
         
-        self.backgroundColor = .white
+        self.backgroundColor = UIColor.init(red: 216/255, green: 207/255, blue: 178/255, alpha: 1)
         self.squareSize = squareSize
         
     }
@@ -35,14 +34,18 @@ class MapView: UIView{
             snakes.removeFromSuperlayer()
         }
         if let snake = viewControllerDelegate?.getSnake(){
-            for location in snake.mapPositions{
+            for i in 0..<snake.mapPositions.count{
                 
-                let snakeDraw = CGRect(origin: CGPoint(x: squareSize * CGFloat(location.x), y: squareSize * CGFloat(location.y)), size: CGSize(width: squareSize, height: squareSize))
+                let snakeDraw = CGRect(origin: CGPoint(x: squareSize * CGFloat(snake.mapPositions[i].x), y: squareSize * CGFloat(snake.mapPositions[i].y)), size: CGSize(width: squareSize, height: squareSize))
                 
                 let sl = CAShapeLayer()
                 sl.path = UIBezierPath(rect: snakeDraw).cgPath
                 sl.strokeColor = UIColor.clear.cgColor
-                sl.fillColor = UIColor.black.cgColor
+        
+                var b = 107+(i * 10)
+                sl.fillColor = UIColor.init(red: 0/255, green: 65/255, blue: CGFloat(b) / 255 , alpha: 1).cgColor
+                
+                
                 self.layer.addSublayer(sl)
                 snakeLayer.append(sl)
             }
@@ -52,11 +55,9 @@ class MapView: UIView{
     func drawFruit(x: Int, y: Int){
         
         
-        //fruit = CGRect(origin: CGPoint(x: squareSize * CGFloat(x), y: squareSize * CGFloat(y)), size: CGSize(width: squareSize, height: squareSize))
+        let fruit = CGRect(origin: CGPoint(x: squareSize * CGFloat(x), y: squareSize * CGFloat(y)), size: CGSize(width: squareSize, height: squareSize))
         
-        
-        
-        fruitLayer.path = UIBezierPath(rect: fruit).cgPath
+        fruitLayer.path = UIBezierPath(ovalIn: fruit).cgPath
         fruitLayer.strokeColor = UIColor.clear.cgColor
         fruitLayer.fillColor = UIColor.red.cgColor
         self.layer.addSublayer(fruitLayer)

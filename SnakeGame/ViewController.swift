@@ -40,7 +40,8 @@ class ViewController: UIViewController, MapViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.view.backgroundColor = UIColor.lightGray
+        //self.view.backgroundColor = UIColor.lightGray
+        self.view.backgroundColor = UIColor.init(red: 178/255, green: 190/255, blue: 186/255, alpha: 1)
         
         createMapView()
         createMenu()

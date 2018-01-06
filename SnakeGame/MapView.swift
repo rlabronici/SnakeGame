@@ -54,7 +54,7 @@ class MapView: UIView{
         
         //fruit = CGRect(origin: CGPoint(x: squareSize * CGFloat(x), y: squareSize * CGFloat(y)), size: CGSize(width: squareSize, height: squareSize))
         
-        fruit = CGR
+        
         
         fruitLayer.path = UIBezierPath(rect: fruit).cgPath
         fruitLayer.strokeColor = UIColor.clear.cgColor

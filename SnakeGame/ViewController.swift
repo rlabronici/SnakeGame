@@ -20,7 +20,7 @@ class ViewController: UIViewController, MapViewDelegate {
     
     var mapView: MapView!
     
-    var snake: Snake!
+    var snake: Snake?
     
     var squareSize: CGFloat!
     
@@ -40,8 +40,7 @@ class ViewController: UIViewController, MapViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //self.view.backgroundColor = UIColor.lightGray
-        self.view.backgroundColor = UIColor.init(red: 178/255, green: 190/255, blue: 186/255, alpha: 1)
+        self.view.backgroundColor = UIColor.init(red: 101/255, green: 150/255, blue: 154/255, alpha: 1)
         
         createMapView()
         createMenu()
@@ -70,18 +69,39 @@ class ViewController: UIViewController, MapViewDelegate {
     }
     
     func createMenu(){
-        easyButton = createButtonMenu(width: width/2, height: height * 0.3, labelName: "Easy")
-        mediumButton = createButtonMenu(width: width/2, height: height * 0.5, labelName: "Medium")
-        hardButton = createButtonMenu(width: width/2, height: height * 0.7, labelName: "Hard")
+        easyButton = createButton(x: width/2, y: height * 0.3, labelName: "Easy", selector: #selector(pressLevelButton(_:)))
+        mediumButton = createButton(x: width/2, y: height * 0.5, labelName: "Medium", selector: #selector(pressLevelButton(_:)))
+        hardButton = createButton(x: width/2, y: height * 0.7, labelName: "Hard", selector: #selector(pressLevelButton(_:)))
     }
 
-    func createButtonMenu(width: CGFloat, height: CGFloat, labelName: String) -> UIButton{
-        let button = UIButton(frame: CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 70, height: 40)))
-        button.addTarget(self, action: #selector(pressLevelButton(_:)), for: .touchUpInside)
+    func createLabel(x:CGFloat, y:CGFloat, labelName: String, fontSize: CGFloat) -> UILabel{
+        
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 0.9 * mapView.frame.width, height: fontSize + 20))
+        label.text = labelName
+        label.center.x = x
+        label.center.y = y
+        label.numberOfLines = 1
+        label.minimumScaleFactor = 0.5
+        label.baselineAdjustment = .alignCenters
+        label.textAlignment  = .center
+        label.font = UIFont(name:"Futura-Bold", size: fontSize)
+        label.adjustsFontSizeToFitWidth = true
+        
+        return label
+    }
+    
+    func createButton(x: CGFloat, y: CGFloat, labelName: String, selector: Selector) -> UIButton{
+        let button = UIButton(frame: CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 0.9 * mapView.frame.width, height: 40)))
+        button.addTarget(self, action: selector, for: .touchUpInside)
         button.setTitle(labelName, for: .normal)
-        button.setTitleColor(.blue, for: .normal)
-        button.center.x = width
-        button.center.y = height
+        button.setTitleColor(UIColor.init(red: 101/255, green: 150/255, blue: 154/255, alpha: 1), for: .normal)
+        button.center.x = x
+        button.center.y = y
+        button.titleLabel?.textAlignment = .center
+        button.titleLabel?.baselineAdjustment = .alignCenters
+        button.titleLabel?.minimumScaleFactor = 0.5
+        button.titleLabel?.adjustsFontSizeToFitWidth = true
+        button.titleLabel?.font = UIFont(name:"Futura-Bold", size: 30.0)
         mapView.addSubview(button)
         
         return button
@@ -112,16 +132,9 @@ class ViewController: UIViewController, MapViewDelegate {
         snake = Snake()
         createFruit()
         
-        scoreLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 0.9 * mapView.frame.width, height: 20))
-        scoreLabel.text = "Score: \(score)"
-        scoreLabel.center.x = mapView.frame.width / 2
-        scoreLabel.center.y = mapView.frame.height * 0.99999999
-        scoreLabel.numberOfLines = 1
-        scoreLabel.minimumScaleFactor = 0.5
-        scoreLabel.baselineAdjustment = .alignCenters
-        scoreLabel.textAlignment  = .center
-        scoreLabel.font = UIFont.systemFont(ofSize: 20)
-        scoreLabel.adjustsFontSizeToFitWidth = true
+        score = 0
+        
+        scoreLabel = createLabel(x: mapView.frame.width / 2, y: mapView.frame.height, labelName: "Score: \(score)", fontSize: 20)
         mapView.addSubview(scoreLabel)
         
         loopGame = Timer.scheduledTimer(timeInterval: difficulty, target: self, selector: #selector(ViewController.loopTimer), userInfo: nil, repeats: true)
@@ -140,34 +153,36 @@ class ViewController: UIViewController, MapViewDelegate {
     
     @objc func handleSwipe(_ sender: UISwipeGestureRecognizer){
         let direction = sender.direction
-        switch direction {
-        case  UISwipeGestureRecognizerDirection.up:
-            if snake.direction != Directions.down{
-                snake.direction = .up
+        if let snake = snake{
+            switch direction {
+            case  UISwipeGestureRecognizerDirection.up:
+                if snake.direction != Directions.down{
+                    snake.direction = .up
+                }
+            case  UISwipeGestureRecognizerDirection.down:
+                if snake.direction != Directions.up{
+                    snake.direction = .down
+                }
+            case  UISwipeGestureRecognizerDirection.right:
+                if snake.direction != Directions.left{
+                    snake.direction = .right
+                }
+            case  UISwipeGestureRecognizerDirection.left:
+                if snake.direction != Directions.right{
+                    snake.direction = .left
+                }
+            default:
+                assert(false, "movimento incorreto")
             }
-        case  UISwipeGestureRecognizerDirection.down:
-            if snake.direction != Directions.up{
-                snake.direction = .down
-            }
-        case  UISwipeGestureRecognizerDirection.right:
-            if snake.direction != Directions.left{
-                snake.direction = .right
-            }
-        case  UISwipeGestureRecognizerDirection.left:
-            if snake.direction != Directions.right{
-                snake.direction = .left
-            }
-        default:
-            assert(false, "movimento incorreto")
         }
     }
 
     @objc func loopTimer(){
         
-        self.snake.move()
-        snake.lastPosition = snake.mapPositions.last
+        self.snake?.move()
+        snake?.lastPosition = snake?.mapPositions.last
         if hasEatenFruit(){
-            snake.increaseSnakeLength()
+            snake?.increaseSnakeLength()
             score += 1
             scoreLabel.text = "Score: \(score)"
             createFruit()
@@ -181,7 +196,7 @@ class ViewController: UIViewController, MapViewDelegate {
     }
     
     func hasEatenFruit() -> Bool{
-        if fruitPosition.x == snake.mapPositions[0].x && fruitPosition.y == snake.mapPositions[0].y{
+        if fruitPosition.x == snake?.mapPositions[0].x && fruitPosition.y == snake?.mapPositions[0].y{
             return true
         }
         return false
@@ -197,7 +212,7 @@ class ViewController: UIViewController, MapViewDelegate {
     }
     
     func canCreateFruit(_ positionX: Int,_ positionY: Int) -> Bool{
-        for position in snake.mapPositions{
+        for position in (snake?.mapPositions)!{
             if positionX == position.x && positionY == position.y{
                 return false
             }
@@ -206,9 +221,9 @@ class ViewController: UIViewController, MapViewDelegate {
     }
     
     func hasHitSomething() -> Bool{
-        let snakeHead = snake.mapPositions.first
-        for i in 1..<snake.length{
-            if snakeHead?.x == snake.mapPositions[i].x && snakeHead?.y == snake.mapPositions[i].y{
+        let snakeHead = snake?.mapPositions.first
+        for i in 1..<(snake?.length)!{
+            if snakeHead?.x == snake?.mapPositions[i].x && snakeHead?.y == snake?.mapPositions[i].y{
                 return true
             }
         }
@@ -220,25 +235,15 @@ class ViewController: UIViewController, MapViewDelegate {
     
     func gameOver(){
         loopGame.invalidate()
-        gameOverLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 0.9 * mapView.frame.width, height: 100))
-        gameOverLabel.text = "Game Over"
-        gameOverLabel.center.x = mapView.frame.width / 2
-        gameOverLabel.center.y = mapView.frame.height * 0.3
-        gameOverLabel.numberOfLines = 1
-        gameOverLabel.minimumScaleFactor = 0.5
-        gameOverLabel.baselineAdjustment = .alignCenters
-        gameOverLabel.textAlignment  = .center
-        gameOverLabel.font = UIFont.systemFont(ofSize: 80)
-        gameOverLabel.adjustsFontSizeToFitWidth = true
+        gameOverLabel = createLabel(x: mapView.frame.width / 2, y: mapView.frame.height * 0.3, labelName: "Game Over", fontSize: 80)
         mapView.addSubview(gameOverLabel)
         
-        let retryButton = UIButton(frame: CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 70, height: 40)))
-        retryButton.addTarget(self, action: #selector(retry(_:)), for: .touchUpInside)
-        retryButton.setTitle("retry", for: .normal)
-        retryButton.setTitleColor(.blue, for: .normal)
-        retryButton.center.x = mapView.frame.width / 2
-        retryButton.center.y = gameOverLabel.frame.height + gameOverLabel.frame.origin.y + 0.2 * mapView.frame.height
-        mapView.addSubview(retryButton)
+        _ = createButton(x: mapView.frame.width / 2,
+                         y: gameOverLabel.frame.height + gameOverLabel.frame.origin.y + 0.2 * mapView.frame.height,
+                         labelName: "Retry",
+                         selector: #selector(retry(_:)))
+        
+
     }
     
     @objc func retry(_ sender: UIButton){

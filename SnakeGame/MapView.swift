@@ -42,7 +42,7 @@ class MapView: UIView{
                 sl.path = UIBezierPath(rect: snakeDraw).cgPath
                 sl.strokeColor = UIColor.clear.cgColor
         
-                var b = 107+(i * 10)
+                let b = 107+(i * 10)
                 sl.fillColor = UIColor.init(red: 0/255, green: 65/255, blue: CGFloat(b) / 255 , alpha: 1).cgColor
                 
                 
@@ -59,7 +59,7 @@ class MapView: UIView{
         
         fruitLayer.path = UIBezierPath(ovalIn: fruit).cgPath
         fruitLayer.strokeColor = UIColor.clear.cgColor
-        fruitLayer.fillColor = UIColor.red.cgColor
+        fruitLayer.fillColor = UIColor.init(red: 255/255, green: 105/255, blue: 35 / 255 , alpha: 1).cgColor
         self.layer.addSublayer(fruitLayer)
     }
     

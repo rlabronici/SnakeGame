@@ -10,5 +10,6 @@ import Foundation
 
 protocol MapViewDelegate {
     func getSnake() -> Snake?
+    func getFruitPosition() -> MapPosition?
     
 }

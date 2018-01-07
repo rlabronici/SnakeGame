@@ -82,6 +82,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		60E02646200292B700E8DD9A /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				60F8DF5C1FFC315F009A2CDD /* Directions.swift */,
+				60F8DF5A1FFC00CC009A2CDD /* Snake.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		60E02647200292C300E8DD9A /* View */ = {
+			isa = PBXGroup;
+			children = (
+				60F8DF5E1FFC504D009A2CDD /* MapView.swift */,
+				60F8DF301FFBB5C0009A2CDD /* Main.storyboard */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		60E02648200292F700E8DD9A /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				60F8DF2E1FFBB5C0009A2CDD /* ViewController.swift */,
+				60F8DF601FFEF208009A2CDD /* MapViewDelegate.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
 		60F8DF201FFBB5C0009A2CDD = {
 			isa = PBXGroup;
 			children = (
@@ -105,16 +132,13 @@
 		60F8DF2B1FFBB5C0009A2CDD /* SnakeGame */ = {
 			isa = PBXGroup;
 			children = (
+				60E02648200292F700E8DD9A /* Controller */,
+				60E02647200292C300E8DD9A /* View */,
+				60E02646200292B700E8DD9A /* Model */,
 				60F8DF2C1FFBB5C0009A2CDD /* AppDelegate.swift */,
-				60F8DF2E1FFBB5C0009A2CDD /* ViewController.swift */,
-				60F8DF601FFEF208009A2CDD /* MapViewDelegate.swift */,
-				60F8DF301FFBB5C0009A2CDD /* Main.storyboard */,
 				60F8DF331FFBB5C0009A2CDD /* Assets.xcassets */,
 				60F8DF351FFBB5C0009A2CDD /* LaunchScreen.storyboard */,
 				60F8DF381FFBB5C0009A2CDD /* Info.plist */,
-				60F8DF5A1FFC00CC009A2CDD /* Snake.swift */,
-				60F8DF5C1FFC315F009A2CDD /* Directions.swift */,
-				60F8DF5E1FFC504D009A2CDD /* MapView.swift */,
 			);
 			path = SnakeGame;
 			sourceTree = "<group>";

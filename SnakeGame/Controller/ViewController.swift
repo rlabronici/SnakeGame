@@ -12,7 +12,6 @@ class ViewController: UIViewController, MapViewDelegate {
     
     var height: CGFloat!
     var width: CGFloat!
-    
     var heightSquaresNumbers: CGFloat = 0
     let widthSquaresNumbers: CGFloat = 17
     let widthGap: CGFloat = 20
@@ -37,6 +36,8 @@ class ViewController: UIViewController, MapViewDelegate {
     
     var gameOverLabel: UILabel!
     
+    var scoreView: UIView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -45,6 +46,8 @@ class ViewController: UIViewController, MapViewDelegate {
         createMapView()
         createMenu()
         self.view.addSubview(mapView)
+        
+        scoreLabel = createLabel(x: mapView.frame.width / 2, y: mapView.frame.height, labelName: "Score: \(score)", fontSize: 20)
         
         addSwipeGesture()
         
@@ -130,12 +133,20 @@ class ViewController: UIViewController, MapViewDelegate {
     func startGameWith(_ difficulty: Double){
         
         snake = Snake()
+        for _ in 0..<3{
+            mapView.updateSnakeLayer()
+        }
+        
         createFruit()
         
         score = 0
         
-        scoreLabel = createLabel(x: mapView.frame.width / 2, y: mapView.frame.height, labelName: "Score: \(score)", fontSize: 20)
-        mapView.addSubview(scoreLabel)
+        scoreView = UIView(frame: CGRect(origin: CGPoint(x: 0, y: 0), size: mapView.frame.size))
+        mapView.addSubview(scoreView)
+        
+        scoreView.addSubview(scoreLabel)
+        scoreLabel.isHidden = false
+        
         
         loopGame = Timer.scheduledTimer(timeInterval: difficulty, target: self, selector: #selector(ViewController.loopTimer), userInfo: nil, repeats: true)
         
@@ -183,16 +194,18 @@ class ViewController: UIViewController, MapViewDelegate {
         snake?.lastPosition = snake?.mapPositions.last
         if hasEatenFruit(){
             snake?.increaseSnakeLength()
+            mapView.updateSnakeLayer()
             score += 1
             scoreLabel.text = "Score: \(score)"
             createFruit()
+            mapView.bringSubview(toFront: scoreView)
         }
         if hasHitSomething(){
             gameOver()
             return
         }
         mapView.drawSnake()
-        mapView.drawFruit(x: fruitPosition.x, y: fruitPosition.y)
+        mapView.drawFruit()
     }
     
     func hasEatenFruit() -> Bool{
@@ -249,11 +262,21 @@ class ViewController: UIViewController, MapViewDelegate {
     @objc func retry(_ sender: UIButton){
         sender.removeFromSuperview()
         gameOverLabel.removeFromSuperview()
+        snake?.mapPositions = [MapPosition]()
+        mapView.restart()
+        score = 0
+        scoreLabel.text = "Score: \(score)"
+        scoreLabel.isHidden = true
+        
         createMenu()
     }
     
     func getSnake() -> Snake?{
         return snake
+    }
+    
+    func getFruitPosition() -> MapPosition?{
+        return fruitPosition
     }
     
     override func didReceiveMemoryWarning() {

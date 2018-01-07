@@ -56,6 +56,7 @@ class Snake {
     
     func increaseSnakeLength(){
         mapPositions.append(MapPosition(x: lastPosition.x, y: lastPosition.y))
+        
         length += 1
     }
     

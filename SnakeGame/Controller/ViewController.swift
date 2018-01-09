@@ -147,9 +147,7 @@ class ViewController: UIViewController, MapViewDelegate {
         scoreView.addSubview(scoreLabel)
         scoreLabel.isHidden = false
         
-        
         loopGame = Timer.scheduledTimer(timeInterval: difficulty, target: self, selector: #selector(ViewController.loopTimer), userInfo: nil, repeats: true)
-        
     }
     
     func addSwipeGesture(){
@@ -189,7 +187,6 @@ class ViewController: UIViewController, MapViewDelegate {
     }
 
     @objc func loopTimer(){
-        
         self.snake?.move()
         snake?.lastPosition = snake?.mapPositions.last
         if hasEatenFruit(){
@@ -255,8 +252,6 @@ class ViewController: UIViewController, MapViewDelegate {
                          y: gameOverLabel.frame.height + gameOverLabel.frame.origin.y + 0.2 * mapView.frame.height,
                          labelName: "Retry",
                          selector: #selector(retry(_:)))
-        
-
     }
     
     @objc func retry(_ sender: UIButton){
@@ -268,7 +263,9 @@ class ViewController: UIViewController, MapViewDelegate {
         scoreLabel.text = "Score: \(score)"
         scoreLabel.isHidden = true
         
-        createMenu()
+        easyButton.isHidden = false
+        mediumButton.isHidden = false
+        hardButton.isHidden = false
     }
     
     func getSnake() -> Snake?{

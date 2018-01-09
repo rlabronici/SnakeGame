@@ -12,7 +12,6 @@ import UIKit
 class MapView: UIView{
     
     var squareSize: CGFloat!
-    var snake: Snake!
     
     var snakeLayers = [CAShapeLayer]()
     var fruitLayer = CAShapeLayer()
@@ -22,10 +21,8 @@ class MapView: UIView{
     init(frame: CGRect, squareSize: CGFloat){
         super.init(frame: frame)
         
-        
         self.backgroundColor = UIColor.init(red: 216/255, green: 207/255, blue: 178/255, alpha: 1)
         self.squareSize = squareSize
-        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -49,7 +46,6 @@ class MapView: UIView{
             for i in 0..<snake.mapPositions.count{
                 let snakeDraw = CGRect(origin: CGPoint(x: squareSize * CGFloat(snake.mapPositions[i].x), y: squareSize * CGFloat(snake.mapPositions[i].y)), size: CGSize(width: squareSize, height: squareSize))
                 snakeLayers[i].path = UIBezierPath(rect: snakeDraw).cgPath
-                
             }
         }
     }
